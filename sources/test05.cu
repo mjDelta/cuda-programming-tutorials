@@ -2,7 +2,7 @@
 // @Date    : 2019-06-23 14:50:31
 // @Author  : Mengji Zhang (zmj_xy@sjtu.edu.cn)
 
-#include "test.h"
+#include "../headers/book.h"
 
 #define imin(a,b) (a<b?a:b)
 
@@ -45,22 +45,22 @@ int main(){
 	b=(float*)malloc(N*sizeof(float));
 	partial_c=(float*)malloc(blocksPerGrid*sizeof(float));
 
-	HANDLE_ERROR(cudaMalloc((void**)&dev_a,N*sizeof(float)));
-	HANDLE_ERROR(cudaMalloc((void**)&dev_b,N*sizeof(float)));
-	HANDLE_ERROR(cudaMalloc((void**)&dev_c,blocksPerGrid*sizeof(float)));
+	cudaMalloc((void**)&dev_a,N*sizeof(float));
+	cudaMalloc((void**)&dev_b,N*sizeof(float));
+	cudaMalloc((void**)&dev_c,blocksPerGrid*sizeof(float));
 
 	for(int i=0;i<N;i++){
 		a[i]=i;
 		b[i]=2*i;
 	}
 
-	HANDLE_ERROR(cudaMemcpy(dev_a,a,N*sizeof(float),cudaMemcpyHostToDevice));
-	HANDLE_ERROR(cudaMemcpy(dev_b,b,N*sizeof(float),cudaMemcpyHostToDevice));
+	cudaMemcpy(dev_a,a,N*sizeof(float),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_b,b,N*sizeof(float),cudaMemcpyHostToDevice);
 
 
 	dot<<<blocksPerGrid,threadsPerBlock>>>(dev_a,dev_b,dev_c);
 
-	HANDLE_ERROR(cudaMemcpy(partial_c,dev_c,blocksPerGrid*sizeof(float),cudaMemcpyDeviceToHost));
+	cudaMemcpy(partial_c,dev_c,blocksPerGrid*sizeof(float),cudaMemcpyDeviceToHost);
 
 	#define sum_square(x) (x*(x+1)*(2*x+1)/6)
 

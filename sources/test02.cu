@@ -2,10 +2,9 @@
 // @Date    : 2019-05-23 22:55:44
 // @Author  : Mengji Zhang (zmj_xy@sjtu.edu.cn)
 
-#include <iostream>
-#include <stdio.h>
-#include "cpu_bitmap.h"
-#include "test.h"
+#include "../headers/bitmap.h"
+#include "../headers/book.h"
+#include "../headers/cuda.h"
 
 #define DIM 1000
 struct cuComplex{
@@ -46,22 +45,22 @@ __global__ void kernel(unsigned char *ptr){
 	int offset=x+y*gridDim.x;
 
 	int juliaValue=julia(x,y);
-	ptr[offset*4+0]=255*juliaValue;
-	ptr[offset*4+1]=0;
-	ptr[offset*4+2]=0;
-	ptr[offset*4+3]=255;
+	ptr[offset*3+0]=255*juliaValue;
+	ptr[offset*3+1]=0;
+	ptr[offset*3+2]=0;
 }
 
 int main(void){
 	CPUBitmap bitmap(DIM,DIM);
 	unsigned char *dev_bitmap;
-	HANDLE_ERROR(cudaMalloc((void**)&dev_bitmap,bitmap.image_size()));
+	char *savePath="test02.bmp";
+	cudaMalloc((void**)&dev_bitmap,bitmap.size);
 
 	dim3 grid(DIM,DIM);
 	kernel<<<grid,1>>>(dev_bitmap);
-	HANDLE_ERROR(cudaMemcpy(bitmap.get_ptr(),dev_bitmap,bitmap.image_size(),cudaMemcpyDeviceToHost));
+	cudaMemcpy(bitmap.pixels,dev_bitmap,bitmap.size,cudaMemcpyDeviceToHost);
 
-	bitmap.display_and_exit();
+	bitmap.saveBitmap(savePath);
 
-	HANDLE_ERROR(cudaFree(dev_bitmap));
+	cudaFree(dev_bitmap);
 }

@@ -2,10 +2,7 @@
 // @Date    : 2019-05-19 21:26:29
 // @Author  : Mengji Zhang (zmj_xy@sjtu.edu.cn)
 
-#include <iostream>
-#include <stdio.h>
-
-#include "test.h"
+#include "../headers/book.h"
 #define N 10
 __global__ void add(int *a,int *b,int *c){
 	int tid=blockIdx.x;
@@ -18,9 +15,9 @@ int main(void){
 	int a[N],b[N],c[N];
 	int *dev_a,*dev_b,*dev_c;
 	
-	HANDLE_ERROR(cudaMalloc((void**)&dev_a,N*sizeof(int)));
-	HANDLE_ERROR(cudaMalloc((void**)&dev_b,N*sizeof(int)));
-	HANDLE_ERROR(cudaMalloc((void**)&dev_c,N*sizeof(int)));
+	cudaMalloc((void**)&dev_a,N*sizeof(int));
+	cudaMalloc((void**)&dev_b,N*sizeof(int));
+	cudaMalloc((void**)&dev_c,N*sizeof(int));
 
 	//assign values for a and b in CPU
 	for(int i=0;i<N;i++){
@@ -29,14 +26,14 @@ int main(void){
 	}
 
 	//copy a and b to GPU
-	HANDLE_ERROR(cudaMemcpy(dev_a,a,N*sizeof(int),cudaMemcpyHostToDevice));
-	HANDLE_ERROR(cudaMemcpy(dev_b,b,N*sizeof(int),cudaMemcpyHostToDevice));
+	cudaMemcpy(dev_a,a,N*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_b,b,N*sizeof(int),cudaMemcpyHostToDevice);
 
 	//run on GPU
 	add<<<N,1>>>(dev_a,dev_b,dev_c);
 
 	//copy result from GPU to CPU
-	HANDLE_ERROR(cudaMemcpy(c,dev_c,N*sizeof(int),cudaMemcpyDeviceToHost));
+	cudaMemcpy(c,dev_c,N*sizeof(int),cudaMemcpyDeviceToHost);
 
 	//result display
 	for(int i=0;i<N;i++){
@@ -51,7 +48,6 @@ int main(void){
 	printf("The program is done. Enter anything to exit.");
 	getchar();
 	return 0;
-
 }
 
 
