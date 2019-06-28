@@ -77,5 +77,6 @@ __constant__ Sphere s[SPHERES];
 	}
 	cudaMemcpyToSymbol(s,temp_s,sizeof(Sphere)*SPHERES);
 ```
-```__constant__``` means constant memory. Due to the high computation power of GPU, the I/O between CPU and GPU influences the computation speed greatly. Make the memory be ```GPU's memory``` rather than improve the I/O speed. And ```__constant__``` makes 16 threads share a same I/O. So, the memory flow will decrease by 94% (15/16) compared to the global memory.
+```__constant__``` means constant memory. Due to the high computation power of GPU, the I/O between CPU and GPU influences the computation speed greatly. Make the memory be GPU's memory rather than improve the I/O speed. And constant memory makes 16 threads share a same I/O. So, the memory flow will decrease by 94% (15/16) compared to the global memory.
+
 ```cudaMemcpyToSymbol``` is specifically designed for constant memory. It is similar to ```cudaMemcpy```.
