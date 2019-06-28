@@ -62,3 +62,20 @@ __global__ void dot(float *a, float *b,float *c){
 
 ```__syncthreads()``` means after all the threads in the same block have run the above codes, the below codes can be ran by threads respectively.
 
+### Case three: test07.cu
+```
+__constant__ Sphere s[SPHERES];
+	Sphere *temp_s=(Sphere*)malloc(sizeof(Sphere)*SPHERES);
+	for(int i=0;i<SPHERES;i++){
+		temp_s[i].r=rnd(1.f);
+		temp_s[i].g=rnd(1.f);
+		temp_s[i].b=rnd(1.f);
+		temp_s[i].x=rnd(DIM)-DIM/2;
+		temp_s[i].y=rnd(DIM)-DIM/2;
+		temp_s[i].z=rnd(DIM)-DIM/2;
+		temp_s[i].radius=rnd(100.f)+50;
+	}
+	cudaMemcpyToSymbol(s,temp_s,sizeof(Sphere)*SPHERES);
+```
+```__constant__``` means constant memory. Due to the high computation power of GPU, the I/O between CPU and GPU influences the computation speed greatly. Make the memory be ```GPU's memory``` rather than improve the I/O speed. And ```__constant__``` makes 16 threads share a same I/O. So, the memory flow will decrease by 94% (15/16) compared to the global memory.
+```cudaMemcpyToSymbol``` is specifically designed for constant memory. It is similar to ```cudaMemcpy```.
